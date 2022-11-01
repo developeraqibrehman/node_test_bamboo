@@ -1,5 +1,5 @@
-import { QueryInterface } from 'sequelize';
-
+import { literal, QueryInterface } from 'sequelize';
+import { ModelAttributes } from 'sequelize/types/model';
 export default {
   /**
    # ToDo: Create a migration that creates all tables for the following user stories
@@ -31,8 +31,248 @@ export default {
    * As a cinema owner I don't want to configure the seating for every show
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  up: (queryInterface: QueryInterface): Promise<void> => {
-    throw new Error('TODO: implement migration in task 4');
+  up: async (queryInterface: QueryInterface): Promise<void> => {
+    await queryInterface.createTable('auditorium', {
+      id: {
+        type: 'integer',
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      name: { type: 'varchar' },
+      url: { type: 'varchar' },
+      capacity: {
+        type: 'integer',
+        allowNull: false,
+      },
+      createdAt: {
+        type: 'timestamp',
+        defaultValue: literal('CURRENT_TIMESTAMP'),
+      },
+      updatedAt: {
+        type: 'timestamp',
+        defaultValue: literal('CURRENT_TIMESTAMP'),
+      },
+    } as ModelAttributes);
+    await queryInterface.createTable('rows', {
+      id: {
+        type: 'integer',
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      number: {  type: 'integer',
+      allowNull: false,},
+      seats: {  type: 'integer',
+      allowNull: false, },
+      auditoriumId: {
+        type: 'integer',
+        allowNull: false,
+        references: {
+          model: {
+            tableName: 'auditorium',
+          },
+          key: 'id',
+        },
+        onDelete: 'cascade',
+      },
+      createdAt: {
+        type: 'timestamp',
+        defaultValue: literal('CURRENT_TIMESTAMP'),
+      },
+      updatedAt: {
+        type: 'timestamp',
+        defaultValue: literal('CURRENT_TIMESTAMP'),
+      },
+    } as ModelAttributes);
+    await queryInterface.createTable('seat_types', {
+      id: {
+        type: 'integer',
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      name: {  type: 'varchar',
+      allowNull: false, },
+      createdAt: {
+        type: 'timestamp',
+        defaultValue: literal('CURRENT_TIMESTAMP'),
+      },
+      updatedAt: {
+        type: 'timestamp',
+        defaultValue: literal('CURRENT_TIMESTAMP'),
+      },
+    } as ModelAttributes);
+    await queryInterface.createTable('seats', {
+      id: {
+        type: 'integer',
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      number: {  type: 'integer',
+      allowNull: false,},
+      name: {  type: 'varchar',
+      allowNull: false, },
+      rowId: {
+        type: 'integer',
+        allowNull: false,
+        references: {
+          model: {
+            tableName: 'rows',
+          },
+          key: 'id',
+        },
+        onDelete: 'cascade',
+      },
+      seatTypeId: {
+        type: 'integer',
+        allowNull: false,
+        references: {
+          model: {
+            tableName: 'seat_types',
+          },
+          key: 'id',
+        },
+        onDelete: 'cascade',
+      },
+      createdAt: {
+        type: 'timestamp',
+        defaultValue: literal('CURRENT_TIMESTAMP'),
+      },
+      updatedAt: {
+        type: 'timestamp',
+        defaultValue: literal('CURRENT_TIMESTAMP'),
+      },
+    } as ModelAttributes);
+    await queryInterface.createTable('customers', {
+      id: {
+        type: 'integer',
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      firstName: {  type: 'varchar' },
+      lastName: {  type: 'varchar' },
+      email: {  type: 'varchar' },
+      mobile: {  type: 'varchar' },
+      createdAt: {
+        type: 'timestamp',
+        defaultValue: literal('CURRENT_TIMESTAMP'),
+      },
+      updatedAt: {
+        type: 'timestamp',
+        defaultValue: literal('CURRENT_TIMESTAMP'),
+      },
+    } as ModelAttributes);
+    await queryInterface.createTable('movies', {
+      id: {
+        type: 'integer',
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      name: {  type: 'varchar' },
+      description: {  type: 'varchar' },
+      minutes: {  type: 'integer' },
+      publishedYear: {  type: 'integer' },
+      createdAt: {
+        type: 'timestamp',
+        defaultValue: literal('CURRENT_TIMESTAMP'),
+      },
+      updatedAt: {
+        type: 'timestamp',
+        defaultValue: literal('CURRENT_TIMESTAMP'),
+      },
+    } as ModelAttributes);
+    await queryInterface.createTable('reservations', {
+      id: {
+        type: 'integer',
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      seatId: {
+        type: 'integer',
+        allowNull: false,
+        references: {
+          model: {
+            tableName: 'seats',
+          },
+          key: 'id',
+        },
+        onDelete: 'cascade',
+      },
+      movieId: {
+        type: 'integer',
+        allowNull: false,
+        references: {
+          model: {
+            tableName: 'movies',
+          },
+          key: 'id',
+        },
+        onDelete: 'cascade',
+      },
+      customerId: {
+        type: 'integer',
+        allowNull: false,
+        references: {
+          model: {
+            tableName: 'customers',
+          },
+          key: 'id',
+        },
+        onDelete: 'cascade',
+      },
+      createdAt: {
+        type: 'timestamp',
+        defaultValue: literal('CURRENT_TIMESTAMP'),
+      },
+      updatedAt: {
+        type: 'timestamp',
+        defaultValue: literal('CURRENT_TIMESTAMP'),
+      },
+    } as ModelAttributes);
+    await queryInterface.createTable('movie_schedule', {
+      id: {
+        type: 'integer',
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      movieId: {
+        type: 'integer',
+        allowNull: false,
+        references: {
+          model: {
+            tableName: 'movies',
+          },
+          key: 'id',
+        },
+        onDelete: 'cascade',
+      },
+      auditoriumId: {
+        type: 'integer',
+        allowNull: false,
+        references: {
+          model: {
+            tableName: 'auditorium',
+          },
+          key: 'id',
+        },
+        onDelete: 'cascade',
+      },
+      startTime: {
+        type: "timestamp",
+      },
+      endTime: {
+        type: "timestamp",
+      },
+      default_price: {
+        type:"float"
+      },
+      createdAt: {
+        type: 'timestamp',
+        defaultValue: literal('CURRENT_TIMESTAMP'),
+      },
+      updatedAt: {
+        type: 'timestamp',
+        defaultValue: literal('CURRENT_TIMESTAMP'),
+      },
+    } as ModelAttributes);
   },
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
